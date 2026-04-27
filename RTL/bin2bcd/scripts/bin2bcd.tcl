@@ -14,7 +14,7 @@
 
 # Quartus Prime: Generate Tcl File for Project
 # File: bin2bcd.tcl
-# Generated on: Thu Apr 23 10:27:25 2026
+# Generated on: Mon Apr 27 08:34:29 2026
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -57,6 +57,8 @@ if {$make_assignments} {
 	set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 	set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 	set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
+	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd_v2.sv
+	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd_v1.sv
 	set_global_assignment -name SDC_FILE ../constraints/bin2bcd.sdc
 	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd.sv
 	set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
