@@ -80,18 +80,19 @@ module bin2bcd_tb();
       while(1) begin
          eof = $feof(fd);
          if(eof) begin
-            file_end  = 1'b1;
+            file_end <= 1'b1;
             valid_in <= 1'b0;
+            @(posedge clk);
             break;
          end
          // Read bin_val and exp_val
          rc = $fscanf(fd, "%d %x\n", bin_val, exp_val);
-         valid_in <= 1'b1;
-         bin      <= bin_val;
+         valid_in   <= 1'b1;
+         bin        <= bin_val;
+         tests_sent <= tests_sent + 1;
          exp_queue.push_back(exp_val);
          @(posedge clk);
-         tests_sent = tests_sent + 1;
-         valid_in  <= 1'b0;
+         valid_in   <= 1'b0;
          repeat(50) @(posedge clk);
       end
    end
