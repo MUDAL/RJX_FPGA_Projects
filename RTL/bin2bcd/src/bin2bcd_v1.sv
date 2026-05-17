@@ -34,7 +34,9 @@
 // 1. No FIFO buffers are used. Input data arrives at a significantly slower
 // rate than the binary-to-BCD conversion process. Therefore, data loss can
 // not occur and no "ready_out" signal is needed.
-// 2. "valid_in" is a 1Hz pulse.
+// 2. "valid_in" is a pulse that indicates the arrival of new data. For the 
+// Altera Cyclone IV application, successive "valid_in" pulses are 1-second 
+// apart. 
 // 3. The design has a high latency as it cycles between SHIFT and ADD states
 // repeatedly. 
 
