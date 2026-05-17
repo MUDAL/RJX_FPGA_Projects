@@ -35,8 +35,8 @@
 // rate than the binary-to-BCD conversion process. Therefore, data loss can
 // not occur and no "ready_out" signal is needed.
 // 2. "valid_in" is a pulse that indicates the arrival of new data. For the 
-// Altera Cyclone IV application, successive "valid_in" pulses are 1-second 
-// apart. 
+// Altera Cyclone IV application, successive "valid_in" pulses are one second 
+// apart. "valid_in" must be asserted for one clock cycle.
 // 3. The design eliminates the unnecessary latency after shifting and adding.
 // Has the lowest overall latency. A finite state machine (FSM) with logically
 // separated sequential and combinational logic is used. 

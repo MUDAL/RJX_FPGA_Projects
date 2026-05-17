@@ -22,6 +22,24 @@
 
 // Algorithm reference: https://en.wikipedia.org/wiki/Double_dabble
 
+// Port signals:
+// 1. clock             (clk)
+// 2. active-low reset  (rst_n)
+// 3. input data valid  (valid_in)
+// 4. binary input      (bin)
+// 5. BCD output        (bcd)
+// 6. output data valid (valid_out)  
+
+// Important points about the design:
+// 1. No FIFO buffers are used. Input data arrives at a significantly slower
+// rate than the binary-to-BCD conversion process. Therefore, data loss can
+// not occur and no "ready_out" signal is needed.
+// 2. "valid_in" is a pulse that indicates the arrival of new data. For the 
+// Altera Cyclone IV application, successive "valid_in" pulses are one second 
+// apart. "valid_in" must be asserted for one clock cycle.
+// 3. "valid_out" indicates a valid BCD output. Once it is asserted, it stays 
+// asserted until a new valid input data arrives.
+
 module bin2bcd #(parameter int          VERSION = 2)(
                  input     logic        clk,
                  input     logic        rst_n,
