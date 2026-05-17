@@ -34,7 +34,9 @@
 // 1. No FIFO buffers are used. Input data arrives at a significantly slower
 // rate than the binary-to-BCD conversion process. Therefore, data loss can
 // not occur and no "ready_out" signal is needed.
-// 2. "valid_in" is a 1Hz pulse.
+// 2. "valid_in" is a pulse that indicates the arrival of new data. For the 
+// Altera Cyclone IV application, successive "valid_in" pulses are 1-second 
+// apart. 
 // 3. The design eliminates the unnecessary latency after shifting and adding.
 // Has the lowest overall latency. A finite state machine (FSM) with logically
 // separated sequential and combinational logic is used. 
@@ -58,31 +60,30 @@ module bin2bcd_v2(
    
    logic [29:0] bcd_reg;
    logic [29:0] bcd_next;
-   logic        add_reg; // asserted when previous state = ADD
-   logic        add_next;
    logic        valid_reg;
    logic        valid_next;
    logic  [3:0] shifts_reg;
    logic  [3:0] shifts_next;
    logic        shift;
-   logic        digit0_add3;
-   logic        digit1_add3;
-   logic        digit2_add3;
-   logic        digit3_add3;
-   logic        add3;
+   logic        dig0_ge5; // Digit 0 greater than or equal to 5
+   logic        dig1_ge5; // Digit 1 greater than or equal to 5
+   logic        dig2_ge5; // Digit 2 greater than or equal to 5
+   logic        dig3_ge5; // Digit 3 greater than or equal to 5
+   logic        dig_ge5;  // Combination of digits greater than or equal to 5
    logic        done;
    
-   assign digit0_add3 = (bcd_reg[17:14] >= 5);
-   assign digit1_add3 = (bcd_reg[21:18] >= 5);
-   assign digit2_add3 = (bcd_reg[25:22] >= 5);
-   assign digit3_add3 = (bcd_reg[29:26] >= 5);
+   // Control signals asserted when the BCD digits are greater than
+   // or equal to 5.
+   assign dig0_ge5 = (bcd_reg[17:14] >= 5);
+   assign dig1_ge5 = (bcd_reg[21:18] >= 5);
+   assign dig2_ge5 = (bcd_reg[25:22] >= 5);
+   assign dig3_ge5 = (bcd_reg[29:26] >= 5);
+   assign dig_ge5  = (dig0_ge5 | dig1_ge5 | dig2_ge5 | dig3_ge5);
    
-   assign add3 = (digit0_add3 | digit1_add3 | digit2_add3 | digit3_add3);
    assign done = (shifts_reg == NUM_OF_SHIFTS);
    
    always_comb begin: bcd_control_path
       state_next = state_reg;
-      add_next   = add_reg;
       valid_next = valid_reg;
       shift      =   1'b0;
       case(state_reg)
@@ -97,15 +98,13 @@ module bin2bcd_v2(
                state_next = IDLE;
                valid_next = 1'b1;
             end
-            else if(!add_reg && add3) begin
-               state_next = ADD;
-               add_next   = 1'b1;
+            else begin
+               if(dig_ge5) state_next = ADD;
+               else        shift      = 1'b1;
             end
-            else if(!add_reg && !add3) shift = 1'b1;
          end
          ADD: begin
             state_next = SHIFT;
-            add_next   =  1'b0;
             shift      =  1'b1;           
          end
       endcase
@@ -120,15 +119,15 @@ module bin2bcd_v2(
    always_comb begin: bcd_data_path
       bcd_next = bcd_reg;
       if(shift)  bcd_next = {bcd_reg[28:0], 1'b0};
-      else if(state_reg  == IDLE && valid_in) begin
-       bcd_next       = 30'b0;
-       bcd_next[13:0] =   bin;
-    end
-      else if(state_next == ADD) begin
-         if(digit0_add3) bcd_next[17:14] = bcd_reg[17:14] + 2'd3;
-         if(digit1_add3) bcd_next[21:18] = bcd_reg[21:18] + 2'd3;
-         if(digit2_add3) bcd_next[25:22] = bcd_reg[25:22] + 2'd3;
-         if(digit3_add3) bcd_next[29:26] = bcd_reg[29:26] + 2'd3;     
+      else if(state_reg == IDLE && valid_in) begin
+         bcd_next       = 30'b0;
+         bcd_next[13:0] =   bin;
+      end
+      else if(state_reg == SHIFT && !done) begin
+         if(dig0_ge5) bcd_next[17:14] = bcd_reg[17:14] + 2'd3;
+         if(dig1_ge5) bcd_next[21:18] = bcd_reg[21:18] + 2'd3;
+         if(dig2_ge5) bcd_next[25:22] = bcd_reg[25:22] + 2'd3;
+         if(dig3_ge5) bcd_next[29:26] = bcd_reg[29:26] + 2'd3;     
       end
    end   
    
@@ -140,14 +139,12 @@ module bin2bcd_v2(
       if(!rst_n) begin
          state_reg  <=  IDLE;
          bcd_reg    <= 30'b0;        
-         add_reg    <=  1'b0;
          valid_reg  <=  1'b0;
          shifts_reg <=  4'b0;
       end
       else begin
          state_reg  <= state_next;
          bcd_reg    <= bcd_next;        
-         add_reg    <= add_next;
          valid_reg  <= valid_next;
          shifts_reg <= shifts_next;
       end
