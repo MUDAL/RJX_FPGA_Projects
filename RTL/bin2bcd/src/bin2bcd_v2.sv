@@ -52,8 +52,9 @@ module bin2bcd_v2(
    localparam int NUM_OF_SHIFTS = 14;
    
    // IDLE:  Default/reset state
-   // SHIFT: In this state, "shifts" are synchronized with "clk."
-   // ADD:   In this state, "adds"   are synchronized with "clk."
+   // SHIFT: In this state, shifts are synchronized with the clock signal.
+   // ADD:   In this state, addition results have been registered and will be 
+   // shifted in the next cycle. 
    typedef enum int unsigned {IDLE = 0, SHIFT, ADD} state_t;
    state_t state_reg;
    state_t state_next;
@@ -118,11 +119,11 @@ module bin2bcd_v2(
    
    always_comb begin: bcd_data_path
       bcd_next = bcd_reg;
-      if(shift)  bcd_next = {bcd_reg[28:0], 1'b0};
-      else if(state_reg == IDLE && valid_in) begin
+      if(state_reg == IDLE && valid_in) begin
          bcd_next       = 30'b0;
          bcd_next[13:0] =   bin;
       end
+      else if(shift) bcd_next = {bcd_reg[28:0], 1'b0};
       else if(state_reg == SHIFT && !done) begin
          if(dig0_ge5) bcd_next[17:14] = bcd_reg[17:14] + 2'd3;
          if(dig1_ge5) bcd_next[21:18] = bcd_reg[21:18] + 2'd3;
