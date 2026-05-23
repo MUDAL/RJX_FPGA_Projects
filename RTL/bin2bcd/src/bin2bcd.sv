@@ -40,7 +40,7 @@
 // 3. "valid_out" indicates a valid BCD output. Once it is asserted, it stays 
 // asserted until a new valid input data arrives.
 
-module bin2bcd #(parameter int          VERSION = 2)(
+module bin2bcd #(parameter int          VERSION = 3)(
                  input     logic        clk,
                  input     logic        rst_n,
                  input     logic        valid_in,
@@ -59,13 +59,21 @@ module bin2bcd #(parameter int          VERSION = 2)(
                                 .bcd       (bcd),
                                 .valid_out (valid_out));
       end
-      else begin
+      else if(VERSION == 2) begin
          bin2bcd_v2 bin2bcd_rtl(.clk       (clk),
                                 .rst_n     (rst_n),
                                 .valid_in  (valid_in),
                                 .bin       (bin),
                                 .bcd       (bcd),
                                 .valid_out (valid_out));    
+      end
+      else if(VERSION == 3) begin
+         bin2bcd_v3 bin2bcd_rtl(.clk       (clk),
+                                .rst_n     (rst_n),
+                                .valid_in  (valid_in),
+                                .bin       (bin),
+                                .bcd       (bcd),
+                                .valid_out (valid_out));       
       end
    endgenerate
 endmodule
