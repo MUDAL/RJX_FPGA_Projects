@@ -20,6 +20,9 @@
 
 // Testbench for the Binary-to-BCD module.
 
+// Modified by Olaoluwa Raji on 24/05/2026.
+// Changes made: Accounted for reset domain crossing (RDC).
+
 `timescale 1ns / 1ps
 
 module bin2bcd_tb();
@@ -32,6 +35,8 @@ module bin2bcd_tb();
    logic [13:0] bin      = 14'b0;
    logic [15:0] bcd;
    logic        valid_out;
+   // Signals: RDC
+   logic rst_n_sync = 1'b1;
    // Signals: Simulation
    logic [13:0] bin_val;
    logic [15:0] exp_val;
@@ -54,6 +59,11 @@ module bin2bcd_tb();
       rst_n <= 1'b1;
    end
    
+   // Instantiate reset domain crossing module.
+   rdc reset_sync(.clk       (clk),
+                  .rst_n_in  (rst_n),
+                  .rst_n_out (rst_n_sync));     
+   
    // Read test vectors from file(s) and inject into the UUT.
    // NB: The text file should contain values from 0 to 9999.
    // $fscanf() with %d and %x format specifier for stimuli
@@ -72,8 +82,8 @@ module bin2bcd_tb();
    int eof;
    
    initial begin: stimuli
-      wait(rst_n == 1'b0);
-      wait(rst_n == 1'b1);
+      wait(rst_n_sync == 1'b0);
+      wait(rst_n_sync == 1'b1);
       fd = $fopen("../scripts/vectors.txt", "r");
       
       if(fd == 0) $fatal(1, "Failed to open vectors.txt");
@@ -113,8 +123,8 @@ module bin2bcd_tb();
    
    initial begin: monitor
       $timeformat(-9, 0, " ns");
-      wait(rst_n == 1'b0);
-      wait(rst_n == 1'b1);
+      wait(rst_n_sync == 1'b0);
+      wait(rst_n_sync == 1'b1);
       forever begin
          @(posedge clk);
          if(exp_queue.size()==0 && file_end && (tests_checked == tests_sent)) begin
