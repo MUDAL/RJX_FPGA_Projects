@@ -18,6 +18,9 @@ vlib work
 vmap work work
 
 # Compile SystemVerilog design and testbench files
+vlog -work work -sv -stats=none ../../../pkgs/pkg.sv
+vlog -work work -sv -stats=none ../../../rdc/src/rdc.sv
+vlog -work work -sv -stats=none ../../../counter/src/counter.sv
 vlog -work work -sv -stats=none ../../src/bin2bcd_v1.sv
 vlog -work work -sv -stats=none ../../src/bin2bcd_v2.sv
 vlog -work work -sv -stats=none ../../src/bin2bcd_v3.sv
