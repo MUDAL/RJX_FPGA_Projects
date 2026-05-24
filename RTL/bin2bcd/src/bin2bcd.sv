@@ -47,13 +47,21 @@ module bin2bcd #(parameter int          VERSION = 3)(
                  input     logic [13:0] bin,
                  output    logic [15:0] bcd,
                  output    logic        valid_out);
-                 
-   // Instantiate either version 1 (higher latency) or
-   // version 2 (lower latency, FSM-based).
+   
+   logic rst_n_sync;
+   
+   // Instantiate reset domain crossing module.
+   rdc reset_sync(.clk       (clk),
+                  .rst_n_in  (rst_n),
+                  .rst_n_out (rst_n_sync));  
+   
+   // Version 1 (high latency)
+   // Version 2 (low latency, FSM-based)
+   // Version 3 (low latency, FSM-based, and generic)
    generate
       if(VERSION == 1) begin
          bin2bcd_v1 bin2bcd_rtl(.clk       (clk),
-                                .rst_n     (rst_n),
+                                .rst_n     (rst_n_sync),
                                 .valid_in  (valid_in),
                                 .bin       (bin),
                                 .bcd       (bcd),
@@ -61,7 +69,7 @@ module bin2bcd #(parameter int          VERSION = 3)(
       end
       else if(VERSION == 2) begin
          bin2bcd_v2 bin2bcd_rtl(.clk       (clk),
-                                .rst_n     (rst_n),
+                                .rst_n     (rst_n_sync),
                                 .valid_in  (valid_in),
                                 .bin       (bin),
                                 .bcd       (bcd),
@@ -69,7 +77,7 @@ module bin2bcd #(parameter int          VERSION = 3)(
       end
       else if(VERSION == 3) begin
          bin2bcd_v3 bin2bcd_rtl(.clk       (clk),
-                                .rst_n     (rst_n),
+                                .rst_n     (rst_n_sync),
                                 .valid_in  (valid_in),
                                 .bin       (bin),
                                 .bcd       (bcd),
