@@ -19,10 +19,17 @@
 //  SOFTWARE.
 
 package pkg;
+   // Brief: Determine if a number is a power of 2.
+   // Param: Value to be tested.
+   // Reference: https://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
+   function bit is_pwr2(int value);
+      return (value & (value - 1)) == 0;
+   endfunction
+
    // Brief: Determine the ceiling of log2 of an integer input.
    // Param: value - Input to the ceil(log2()) operation.
    function int clog2(int value);
-      if((value % 2) != 0) begin
+      if(!is_pwr2(value)) begin
          clog2 = $clog2(value);
       end
       else begin
