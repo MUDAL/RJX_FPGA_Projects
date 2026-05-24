@@ -29,38 +29,15 @@
 // 5. BCD output        (bcd)
 // 6. output data valid (valid_out)  
 
-package util_pkg;
-   // Brief: Determine the ceiling of log2 of an integer input.
-   // Param: value - Input to the ceil(log2()) operation.
-   function automatic int func_clg2(int value);
-      if((value % 2) != 0) begin
-         func_clg2 = $clog2(value);
-      end
-      else begin
-         func_clg2 = $clog2(value) + 1;
-      end
-      return func_clg2;
-   endfunction
-   
-   // Brief: Determine the ceiling of a ratio of two integers.
-   // Param: num   - Numerator.
-   // Param: denom - Denominator.
-   function automatic int func_ceil(int num, int denom);
-      func_ceil = (num + denom - 1) / denom;
-   endfunction
-endpackage
-
 module bin2bcd_v3
-   import util_pkg::*;
-   #(parameter int MAX_IN = 9999)
+   #(parameter int BIN_WIDTH = 14)
     (clk, rst_n, valid_in, bin, bcd, valid_out);
     
-   localparam int BIN_WIDTH     =  func_clg2(MAX_IN);
-   localparam int BCD_DIGITS    =  func_ceil(BIN_WIDTH,3);
-   localparam int BCD_WIDTH     =  4*BCD_DIGITS;   
+   localparam int BCD_DIGITS    =  pkg::ceil(BIN_WIDTH,3);
+   localparam int BCD_WIDTH     =  BCD_DIGITS*4;   
    localparam int NUM_OF_SHIFTS =  BIN_WIDTH;
    localparam int BCD_REG_WIDTH =  BIN_WIDTH + BCD_WIDTH;   
-   localparam int COUNTER_WIDTH =  func_clg2(BIN_WIDTH);   
+   localparam int COUNTER_WIDTH =  pkg::clog2(BIN_WIDTH);   
    
    // Port signals
    input  logic                 clk;
@@ -82,14 +59,13 @@ module bin2bcd_v3
    logic [BCD_REG_WIDTH-1:0] bcd_next;
    logic                     valid_reg;
    logic                     valid_next;
-   logic [COUNTER_WIDTH-1:0] shifts_reg;
-   logic [COUNTER_WIDTH-1:0] shifts_next;
+   logic [COUNTER_WIDTH-1:0] shifts_count;
    logic                     shift;
-   logic [BCD_DIGITS-1:0]    ge5;  
+   logic [BCD_DIGITS-1:0]    ge5;
    logic                     dig_ge5;  
    logic                     done;
-
-   assign done = (shifts_reg == NUM_OF_SHIFTS);
+     
+   assign done = (shifts_count == NUM_OF_SHIFTS);
    
    // Control signals asserted when the BCD digits are greater than
    // or equal to 5.
@@ -128,11 +104,13 @@ module bin2bcd_v3
       endcase
    end
    
-   always_comb begin: shifts_counter
-      if(shift)       shifts_next =  shifts_reg + 1'b1;
-      else if(done)   shifts_next = {COUNTER_WIDTH{1'b0}};
-      else            shifts_next =  shifts_reg;
-   end
+   // Instantiate counter to count the number of shifts
+   counter #(.WIDTH  (COUNTER_WIDTH)) shifts_counter
+            (.clk    (clk),
+             .rst_n  (rst_n),
+             .enable (shift),
+             .clear  (done),
+             .count  (shifts_count));
    
    always_comb begin: bcd_data_path
       bcd_next = bcd_reg;
@@ -160,13 +138,11 @@ module bin2bcd_v3
          state_reg  <=        IDLE;
          bcd_reg    <= {BCD_REG_WIDTH{1'b0}};        
          valid_reg  <=        1'b0;
-         shifts_reg <= {COUNTER_WIDTH{1'b0}};
       end
       else begin
          state_reg  <= state_next;
          bcd_reg    <= bcd_next;        
          valid_reg  <= valid_next;
-         shifts_reg <= shifts_next;
       end
    end
 endmodule
