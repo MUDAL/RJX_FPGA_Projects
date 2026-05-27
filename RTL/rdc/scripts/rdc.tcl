@@ -14,7 +14,7 @@
 
 # Quartus Prime: Generate Tcl File for Project
 # File: rdc.tcl
-# Generated on: Sun May 24 08:48:27 2026
+# Generated on: Sun May 24 20:41:59 2026
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -52,12 +52,13 @@ if {$make_assignments} {
 	set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 	set_global_assignment -name EDA_DESIGN_ENTRY_SYNTHESIS_TOOL Custom
 	set_global_assignment -name EDA_INPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_design_synthesis
-	set_global_assignment -name SYSTEMVERILOG_FILE ../src/rdc.sv
 	set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 	set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 	set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 	set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 	set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+	set_global_assignment -name SDC_FILE ../constraints/rdc.sdc
+	set_global_assignment -name SYSTEMVERILOG_FILE ../src/rdc.sv
 	set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 
 	# Commit assignments

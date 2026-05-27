@@ -13,8 +13,8 @@
 # refer to the applicable agreement for further details.
 
 # Quartus Prime: Generate Tcl File for Project
-# File: bin2bcd.tcl
-# Generated on: Sun May 24 17:05:01 2026
+# File: counter.tcl
+# Generated on: Sun May 24 20:40:03 2026
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -24,16 +24,16 @@ set make_assignments 1
 
 # Check that the right project is open
 if {[is_project_open]} {
-	if {[string compare $quartus(project) "bin2bcd"]} {
-		puts "Project bin2bcd is not open"
+	if {[string compare $quartus(project) "counter"]} {
+		puts "Project counter is not open"
 		set make_assignments 0
 	}
 } else {
 	# Only open if not already open
-	if {[project_exists bin2bcd]} {
-		project_open -revision bin2bcd bin2bcd
+	if {[project_exists counter]} {
+		project_open -revision counter counter
 	} else {
-		project_new -revision bin2bcd bin2bcd
+		project_new -revision counter counter
 	}
 	set need_to_close_project 1
 }
@@ -43,7 +43,7 @@ if {$make_assignments} {
 	set_global_assignment -name FAMILY "Cyclone IV E"
 	set_global_assignment -name DEVICE EP4CE6E22C8
 	set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
-	set_global_assignment -name PROJECT_CREATION_TIME_DATE "09:31:58  APRIL 16, 2026"
+	set_global_assignment -name PROJECT_CREATION_TIME_DATE "07:26:35  MAY 24, 2026"
 	set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
 	set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 	set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
@@ -52,19 +52,15 @@ if {$make_assignments} {
 	set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 	set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 	set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+	set_global_assignment -name EDA_DESIGN_ENTRY_SYNTHESIS_TOOL Custom
+	set_global_assignment -name EDA_INPUT_DATA_FORMAT "VERILOG HDL" -section_id eda_design_synthesis
 	set_global_assignment -name VERILOG_INPUT_VERSION SYSTEMVERILOG_2005
 	set_global_assignment -name VERILOG_SHOW_LMF_MAPPING_MESSAGES OFF
 	set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 	set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 	set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-	set_global_assignment -name SYSTEMVERILOG_FILE ../../counter/src/counter.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../../rdc/src/rdc.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../../pkgs/pkg.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd_v2.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd_v1.sv
-	set_global_assignment -name SDC_FILE ../constraints/bin2bcd.sdc
-	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd_v3.sv
+	set_global_assignment -name SDC_FILE ../constraints/counter.sdc
+	set_global_assignment -name SYSTEMVERILOG_FILE ../src/counter.sv
 	set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 
 	# Commit assignments
