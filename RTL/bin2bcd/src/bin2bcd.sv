@@ -40,13 +40,13 @@
 // 3. "valid_out" indicates a valid BCD output. Once it is asserted, it stays 
 // asserted until a new valid input data arrives.
 
-module bin2bcd #(parameter int          VERSION = 3)(
-                 input     logic        clk,
-                 input     logic        rst_n,
-                 input     logic        valid_in,
-                 input     logic [13:0] bin,
-                 output    logic [15:0] bcd,
-                 output    logic        valid_out);
+module bin2bcd #(parameter int VERSION = 3)(
+                 input     logic                      clk,
+                 input     logic                      rst_n,
+                 input     logic                      valid_in,
+                 input     logic [pkg::BIN_WIDTH-1:0] bin,
+                 output    logic [pkg::BCD_WIDTH-1:0] bcd,
+                 output    logic                      valid_out);
    
    logic rst_n_sync;
    
