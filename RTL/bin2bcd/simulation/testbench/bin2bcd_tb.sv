@@ -20,8 +20,14 @@
 
 // Testbench for the Binary-to-BCD module.
 
-// Modified by Olaoluwa Raji on 24/05/2026.
-// Changes made: Accounted for reset domain crossing (RDC).
+// Changes made (24/05/2026): Accounted for reset domain crossing (RDC).
+// Changes made (31/05/2026): Made the initialization of the binary input
+// generic. 
+
+// Comment: This testbench works for all 3 versions of the RTL code if
+// pkg::BIN_WIDTH is set to 14. If pkg::BIN_WIDTH is set to a different
+// value, then only version 3 would work because it's the only generic
+// RTL design out of the 3.
 
 `timescale 1ns / 1ps
 
@@ -32,7 +38,7 @@ module bin2bcd_tb();
    logic                      clk      =  1'b0;
    logic                      rst_n    =  1'b1;
    logic                      valid_in =  1'b0;
-   logic [pkg::BIN_WIDTH-1:0] bin      = 14'b0;
+   logic [pkg::BIN_WIDTH-1:0] bin      = {(pkg::BIN_WIDTH){1'b0}};
    logic [pkg::BCD_WIDTH-1:0] bcd;
    logic                      valid_out;
    // Signals: RDC
