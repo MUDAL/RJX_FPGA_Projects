@@ -29,18 +29,18 @@ module bin2bcd_tb();
    // Constant
    localparam int CLK_PERIOD = 10;
    // Signals: UUT
-   logic        clk      =  1'b0;
-   logic        rst_n    =  1'b1;
-   logic        valid_in =  1'b0;
-   logic [13:0] bin      = 14'b0;
-   logic [15:0] bcd;
-   logic        valid_out;
+   logic                      clk      =  1'b0;
+   logic                      rst_n    =  1'b1;
+   logic                      valid_in =  1'b0;
+   logic [pkg::BIN_WIDTH-1:0] bin      = 14'b0;
+   logic [pkg::BCD_WIDTH-1:0] bcd;
+   logic                      valid_out;
    // Signals: RDC
    logic rst_n_sync = 1'b1;
    // Signals: Simulation
-   logic [13:0] bin_val;
-   logic [15:0] exp_val;
-   logic [15:0] exp_queue[$]; // Queue of expected values
+   logic [pkg::BIN_WIDTH-1:0] bin_val;
+   logic [pkg::BCD_WIDTH-1:0] exp_val;
+   logic [pkg::BCD_WIDTH-1:0] exp_queue[$]; // Queue of expected values
    logic file_end      = 1'b0;
    int   tests_sent    =  0;
    int   tests_checked =  0;
@@ -116,7 +116,7 @@ module bin2bcd_tb();
                .valid_out (valid_out));   
                
    // Monitor UUT's output and compare with expected values.
-   logic [15:0] exp_deq;
+   logic [pkg::BCD_WIDTH-1:0] exp_deq;
    logic output_was_high = 1'b0;
    int   passed = 0;
    int   failed = 0;
