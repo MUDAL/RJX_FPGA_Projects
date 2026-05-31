@@ -29,24 +29,17 @@
 // 5. BCD output        (bcd)
 // 6. output data valid (valid_out)  
 
-module bin2bcd_v3
-   #(parameter int BIN_WIDTH = 14)
-    (clk, rst_n, valid_in, bin, bcd, valid_out);
-    
-   localparam int BCD_DIGITS    =  pkg::ceil(BIN_WIDTH,3);
-   localparam int BCD_WIDTH     =  BCD_DIGITS*4;   
-   localparam int NUM_OF_SHIFTS =  BIN_WIDTH;
-   localparam int BCD_REG_WIDTH =  BIN_WIDTH + BCD_WIDTH;   
-   localparam int COUNTER_WIDTH =  pkg::clog2(BIN_WIDTH);   
-   
-   // Port signals
-   input  logic                 clk;
-   input  logic                 rst_n;
-   input  logic                 valid_in;
-   input  logic [BIN_WIDTH-1:0] bin;
-   output logic [BCD_WIDTH-1:0] bcd;
-   output logic                 valid_out;   
-   
+module bin2bcd_v3(input  logic                      clk,
+                  input  logic                      rst_n,
+                  input  logic                      valid_in,
+                  input  logic [pkg::BIN_WIDTH-1:0] bin,
+                  output logic [pkg::BCD_WIDTH-1:0] bcd,
+                  output logic                      valid_out);
+                  
+   localparam int NUM_OF_SHIFTS =  pkg::BIN_WIDTH;
+   localparam int BCD_REG_WIDTH =  pkg::BIN_WIDTH + pkg::BCD_WIDTH;   
+   localparam int COUNTER_WIDTH =  pkg::clog2(pkg::BIN_WIDTH);   
+
    // IDLE:  Default/reset state
    // SHIFT: In this state, shifts are synchronized with the clock signal.
    // ADD:   In this state, addition results have been registered and will be 
@@ -55,22 +48,22 @@ module bin2bcd_v3
    state_t state_reg;
    state_t state_next;
    
-   logic [BCD_REG_WIDTH-1:0] bcd_reg;
-   logic [BCD_REG_WIDTH-1:0] bcd_next;
-   logic                     valid_reg;
-   logic                     valid_next;
-   logic [COUNTER_WIDTH-1:0] shifts_count;
-   logic                     shift;
-   logic [BCD_DIGITS-1:0]    ge5;
-   logic                     dig_ge5;  
-   logic                     done;
+   logic [BCD_REG_WIDTH-1:0]   bcd_reg;
+   logic [BCD_REG_WIDTH-1:0]   bcd_next;
+   logic                       valid_reg;
+   logic                       valid_next;
+   logic [COUNTER_WIDTH-1:0]   shifts_count;
+   logic                       shift;
+   logic [pkg::BCD_DIGITS-1:0] ge5;
+   logic                       dig_ge5;  
+   logic                       done;
      
    assign done = (shifts_count == NUM_OF_SHIFTS);
    
    // Control signals asserted when the BCD digits are greater than
    // or equal to 5.
    always_comb begin: bcd_digits_logic  
-      for(int i = 0; i < BCD_DIGITS; i++) begin
+      for(int i = 0; i < pkg::BCD_DIGITS; i++) begin
          ge5[i] = (bcd_reg[BCD_REG_WIDTH-1-(4*i) -: 4] >= 5);
       end
       dig_ge5 = |ge5;   
@@ -115,12 +108,12 @@ module bin2bcd_v3
    always_comb begin: bcd_data_path
       bcd_next = bcd_reg;
       if(state_reg == IDLE && valid_in) begin
-         bcd_next                = {BCD_REG_WIDTH{1'b0}};
-         bcd_next[BIN_WIDTH-1:0] =  bin;
+         bcd_next                     = {BCD_REG_WIDTH{1'b0}};
+         bcd_next[pkg::BIN_WIDTH-1:0] =  bin;
       end
       else if(shift) bcd_next = {bcd_reg[BCD_REG_WIDTH-2:0], 1'b0};
       else if(state_reg == SHIFT && !done) begin
-         for(int i = 0; i < BCD_DIGITS; i++) begin
+         for(int i = 0; i < pkg::BCD_DIGITS; i++) begin
             if(bcd_reg[ BCD_REG_WIDTH-1-(4*i) -: 4] >= 5) begin
                bcd_next[BCD_REG_WIDTH-1-(4*i) -: 4] = 
                bcd_reg[ BCD_REG_WIDTH-1-(4*i) -: 4] + 2'd3;
@@ -130,7 +123,7 @@ module bin2bcd_v3
    end   
    
    // Top-level outputs
-   assign bcd       = bcd_reg[BCD_REG_WIDTH-1:BIN_WIDTH];
+   assign bcd       = bcd_reg[BCD_REG_WIDTH-1:pkg::BIN_WIDTH];
    assign valid_out = valid_reg; 
    
    always_ff @(negedge rst_n, posedge clk) begin: registers
