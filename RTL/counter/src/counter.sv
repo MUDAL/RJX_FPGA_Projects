@@ -47,11 +47,11 @@ module counter
    
    always_comb begin: data_path
       count_next = count_reg;
-      if(enable) begin
+      if(clear) count_next = {WIDTH{1'b0}};     
+      else if(enable) begin
          if(count_reg == MAX - 1) count_next = {WIDTH{1'b0}}; 
          else                     count_next = count_reg + 1'b1;
-      end
-      else if(clear) count_next = {WIDTH{1'b0}};         
+      end        
    end
    
    always_ff @(negedge rst_n, posedge clk) begin: registers
