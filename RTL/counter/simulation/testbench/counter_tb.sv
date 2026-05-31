@@ -20,18 +20,13 @@
 
 // Counter Testbench.
 
-// TO-DO:
-// 1. Test for counter "enable". Monitor "count".
-// 2. Test for "clear". Check if "count = 0" one cycle after "clear = 1"
-// 3. Test for "done".  Check if "done = 1" (for one cycle) when "count" 
-// reaches limit and resets. 
-
 `timescale 1ns / 1ps
 
 module counter_tb();
    
-   localparam int CLK_PERIOD = 100;
-   localparam int WIDTH = 4;
+   localparam int CLK_PERIOD = 10;
+   localparam int WIDTH      = 4;
+   localparam int MAX_CYCLES = 2**WIDTH;
    // Signals: UUT
    logic             clk    = 1'b0;
    logic             rst_n  = 1'b1;
@@ -42,7 +37,7 @@ module counter_tb();
    
    initial begin: clock_gen
       forever begin
-         #(CLK_PERIOD/2);
+         #(CLK_PERIOD / 2);
          clk <= ~clk;
       end
    end
@@ -52,17 +47,44 @@ module counter_tb();
       rst_n <= 1'b0;
       repeat(5) @(posedge clk);
       rst_n <= 1'b1;
-      repeat(5) @(posedge clk);
    end
    
+   localparam int CYCLES_BEFORE_CLEAR = 5; 
+   int time_enabled = 0;
+   
    initial begin: stimuli
-      wait(rst_n == 0);
-      wait(rst_n == 1);
-      // Enough time for rst_n to be safely de-asserted
-      repeat(10) @(posedge clk); 
+      $display("%0t | Counter should count %0d cycles",$time, MAX_CYCLES);
+      wait(rst_n == 1'b0);
+      wait(rst_n == 1'b1);
+      repeat(2) @(posedge clk); // De-assert rst_n synchronously 
+      
+      // Test 1: Counter enable
+      $display("%0t | Test 1: \"counter enable\"",$time);
+      @(posedge clk);
+      $display("%0t | Asserting the \"enable\" input",$time);
+      enable       <= 1'b1;
+      time_enabled  = $time;
       
       forever begin
+         @(posedge clk);
+         if(done) begin
+            $display("%0t | De-asserting the \"enable\" input",$time);
+            enable <= 1'b0;
+            break;
+         end
       end
+      
+      // Test 2: Counter clear
+      $display("%0t | Test 2: clearing after %0d cycles since asserting \"enable\"",
+               $time, CYCLES_BEFORE_CLEAR + 1);
+      @(posedge clk);
+      $display("%0t | Asserting the \"enable\" input",$time);
+      enable       <= 1'b1;
+      time_enabled  = $time;
+      repeat(CYCLES_BEFORE_CLEAR) @(posedge clk);
+      $display("%0t | Asserting the \"clear\" input",$time);
+      clear <= 1'b1;
+      @(posedge clk);
    end
    
    // UUT
@@ -74,14 +96,52 @@ module counter_tb();
              .count  (count),
              .done   (done));
    
+   int cycles_counted  = 0;
+   bit test1_completed = 1'b0;
+   
    initial begin: monitor
       $timeformat(-9, 0, " ns");
-      wait(rst_n == 0);
-      wait(rst_n == 1);
-      // Enough time for rst_n to be safely de-asserted
-      repeat(10) @(posedge clk); 
+      wait(rst_n == 1'b0);
+      wait(rst_n == 1'b1);
+      repeat(2) @(posedge clk); // De-assert rst_n synchronously 
       
+      // Test 1: Monitoring counter enable
       forever begin
+         @(posedge clk);
+         if(done && !test1_completed) begin
+            cycles_counted = ($time - time_enabled) / CLK_PERIOD;
+            if(cycles_counted == MAX_CYCLES) begin
+               $display("[PASS]: Counter done after %0d cycles, expected %0d cycles", 
+                        cycles_counted, MAX_CYCLES);
+               test1_completed = 1'b1;
+               break;
+            end
+            else begin
+               $fatal(1, "[FAIL]: Counter done after %0d cycles, expected %0d cycles", 
+                      cycles_counted, MAX_CYCLES);          
+            end
+         end
+      end
+      
+      // Test 2: Monitoring counter output upon clearing
+      // Due to delta cycle problems when sampling on the rising edge of clk,
+      // I decided to sample on the falling edge. Another approach to resolving
+      // the issue is to wait for a rising edge and introduce a small delay
+      // (e.g. 1ps) after the rising edge.
+      forever begin
+         @(negedge clk);
+         if(clear == 1'b1 && count == {(WIDTH){1'b0}}) begin
+            cycles_counted = ($time - time_enabled) / CLK_PERIOD;
+            if(cycles_counted == (CYCLES_BEFORE_CLEAR + 1)) begin
+               $display("[PASS]: Counter cleared %0d cycles after asserting \"enable\", expected %0d cycles", 
+                        cycles_counted, (CYCLES_BEFORE_CLEAR + 1));
+               $finish;
+            end
+            else begin
+               $fatal(1, "[FAIL]: Counter cleared %0d cycles after asserting \"enable\", expected %0d cycles", 
+                      cycles_counted, (CYCLES_BEFORE_CLEAR + 1));           
+            end
+         end  
       end
    end
 endmodule
