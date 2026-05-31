@@ -18,7 +18,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-package pkg;
+package pkg;   
    // Brief: Determine if a number is a power of 2.
    // Param: Value to be tested.
    // Reference: https://stackoverflow.com/questions/600293/how-to-check-if-a-number-is-a-power-of-2
@@ -44,4 +44,9 @@ package pkg;
    function int ceil(int num, int denom);
       ceil = (num + denom - 1) / denom;
    endfunction
+   
+   // For bin2bcd module
+   parameter int BIN_WIDTH  = 14;
+   parameter int BCD_DIGITS = pkg::ceil(BIN_WIDTH,3);
+   parameter int BCD_WIDTH  = 4*BCD_DIGITS;  
 endpackage
