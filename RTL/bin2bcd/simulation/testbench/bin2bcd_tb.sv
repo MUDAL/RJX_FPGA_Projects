@@ -115,7 +115,7 @@ module bin2bcd_tb();
    
    // UUT
    bin2bcd uut(.clk       (clk),
-               .rst_n     (rst_n),
+               .rst_n     (rst_n_sync),
                .valid_in  (valid_in),
                .bin       (bin),
                .bcd       (bcd),
