@@ -23,30 +23,30 @@
 // Changes made (24/05/2026): Accounted for reset domain crossing (RDC).
 // Changes made (31/05/2026): Made the initialization of the binary input
 // generic. 
-
-// Comment: This testbench works for all 3 versions of the RTL code if
-// pkg::BIN_WIDTH is set to 14. If pkg::BIN_WIDTH is set to a different
-// value, then only version 3 would work because it's the only generic
-// RTL design out of the 3.
+// Changes made (03/06/2026): Removed versions 1 and 2 of the RTL designs.
+// Removed bin2bcd parameter definitions from the global package (pkg.sv)
+// to give more flexibility in instantiating the bin2bcd design.  
 
 `timescale 1ns / 1ps
 
 module bin2bcd_tb();
    // Constant
    localparam int CLK_PERIOD = 10;
+   localparam int BIN_WIDTH  = 32;
+   localparam int BCD_WIDTH  = 4*pkg::ceil(BIN_WIDTH,3);
    // Signals: UUT
-   logic                      clk      =  1'b0;
-   logic                      rst_n    =  1'b1;
-   logic                      valid_in =  1'b0;
-   logic [pkg::BIN_WIDTH-1:0] bin      = {(pkg::BIN_WIDTH){1'b0}};
-   logic [pkg::BCD_WIDTH-1:0] bcd;
-   logic                      valid_out;
+   logic                 clk      =  1'b0;
+   logic                 rst_n    =  1'b1;
+   logic                 valid_in =  1'b0;
+   logic [BIN_WIDTH-1:0] bin      = {BIN_WIDTH{1'b0}};
+   logic [BCD_WIDTH-1:0] bcd;
+   logic                 valid_out;
    // Signals: RDC
    logic rst_n_sync = 1'b1;
    // Signals: Simulation
-   logic [pkg::BIN_WIDTH-1:0] bin_val;
-   logic [pkg::BCD_WIDTH-1:0] exp_val;
-   logic [pkg::BCD_WIDTH-1:0] exp_queue[$]; // Queue of expected values
+   logic [BIN_WIDTH-1:0] bin_val;
+   logic [BCD_WIDTH-1:0] exp_val;
+   logic [BCD_WIDTH-1:0] exp_queue[$]; // Queue of expected values
    logic file_end      = 1'b0;
    int   tests_sent    =  0;
    int   tests_checked =  0;
@@ -71,17 +71,17 @@ module bin2bcd_tb();
                   .rst_n_out (rst_n_sync));     
    
    // Read test vectors from file(s) and inject into the UUT.
-   // NB: The text file should contain values from 0 to 9999.
    // $fscanf() with %d and %x format specifier for stimuli
-   // and expected values, respectively. The same text file is to used.
+   // and expected values, respectively. The same text file is used.
    
    // Expected values are pushed into a queue.
    // "valid_in" is de-asserted after injecting the UUT
    // with all test stimuli. A reasonable delay is added after
-   // this to simulate the requirement for the "valid_in" pulse. Ideally,
-   // the pulse is 1 Hz but its frequency is increased to speed up the
-   // simulation. The "valid_in" period should exceed the UUT's latency (or
-   // conversion time).
+   // this to simulate the requirement for the "valid_in" pulse. 
+   // For the Altera Cyclone IV application, the pulse is 1 Hz 
+   // but its frequency is increased to speed up the simulation. 
+   // The "valid_in" period should exceed the UUT's latency 
+   // (or conversion time).
    
    int fd;
    int rc;
@@ -122,10 +122,10 @@ module bin2bcd_tb();
                .valid_out (valid_out));   
                
    // Monitor UUT's output and compare with expected values.
-   logic [pkg::BCD_WIDTH-1:0] exp_deq;
-   logic output_was_high = 1'b0;
-   int   passed = 0;
-   int   failed = 0;
+   logic [BCD_WIDTH-1:0] exp_deq;
+   logic  output_was_high = 1'b0;
+   int    passed = 0;
+   int    failed = 0;
    
    initial begin: monitor
       $timeformat(-9, 0, " ns");

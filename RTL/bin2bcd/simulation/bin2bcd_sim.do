@@ -21,9 +21,6 @@ vmap work work
 vlog -work work -sv -stats=none ../../../pkgs/pkg.sv
 vlog -work work -sv -stats=none ../../../rdc/src/rdc.sv
 vlog -work work -sv -stats=none ../../../counter/src/counter.sv
-vlog -work work -sv -stats=none ../../src/bin2bcd_v1.sv
-vlog -work work -sv -stats=none ../../src/bin2bcd_v2.sv
-vlog -work work -sv -stats=none ../../src/bin2bcd_v3.sv
 vlog -work work -sv -stats=none ../../src/bin2bcd.sv
 vlog -work work -sv -stats=none ../testbench/bin2bcd_tb.sv
 

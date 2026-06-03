@@ -130,7 +130,7 @@ module counter_tb();
       // (e.g. 1ps) after the rising edge.
       forever begin
          @(negedge clk);
-         if(clear == 1'b1 && count == {(WIDTH){1'b0}}) begin
+         if(clear == 1'b1 && count == {WIDTH{1'b0}}) begin
             cycles_counted = ($time - time_enabled) / CLK_PERIOD;
             if(cycles_counted == (CYCLES_BEFORE_CLEAR + 1)) begin
                $display("[PASS]: Counter cleared %0d cycles after asserting \"enable\", expected %0d cycles", 

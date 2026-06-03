@@ -44,9 +44,4 @@ package pkg;
    function int ceil(int num, int denom);
       ceil = (num + denom - 1) / denom;
    endfunction
-   
-   // For bin2bcd module
-   parameter int BIN_WIDTH  = 14;
-   parameter int BCD_DIGITS = pkg::ceil(BIN_WIDTH,3);
-   parameter int BCD_WIDTH  = 4*BCD_DIGITS;  
 endpackage

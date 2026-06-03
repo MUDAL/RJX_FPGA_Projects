@@ -29,14 +29,14 @@
 // 6. done
 
 module counter
-   #(parameter int WIDTH = 4,
-     parameter int MAX   = 2**WIDTH)
-    (input  logic             clk,
-     input  logic             rst_n,
-     input  logic             enable,
-     input  logic             clear,
-     output logic [WIDTH-1:0] count,
-     output logic             done);
+   #(parameter int    WIDTH = 4,
+     parameter int    MAX   = 2**WIDTH)
+    (input     logic             clk,
+     input     logic             rst_n,
+     input     logic             enable,
+     input     logic             clear,
+     output    logic [WIDTH-1:0] count,
+     output    logic             done);
    
    logic [WIDTH-1:0] count_reg;
    logic [WIDTH-1:0] count_next;

@@ -1,12 +1,14 @@
 
-NUM_VECTORS = 9999          # Total number of testcases to generate
+NUM_VECTORS = pow(2,16)  # Total number of testcases to generate
 
 def main() -> None:
     path = "vectors.txt"
 
     testcases: list[int] = []
-    for num in range(0,9999+1):
+    for num in range(0,NUM_VECTORS):
         testcases.append(num)
+
+    testcases.append(pow(2,32) - 1)
 
     # Write files
     with open(path, "w") as fa:
