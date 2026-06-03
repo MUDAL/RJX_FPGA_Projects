@@ -14,7 +14,7 @@
 
 # Quartus Prime: Generate Tcl File for Project
 # File: bin2bcd.tcl
-# Generated on: Wed Jun 03 06:46:07 2026
+# Generated on: Wed Jun 03 07:09:54 2026
 
 # Load Quartus Prime Tcl Project package
 package require ::quartus::project
@@ -58,7 +58,6 @@ if {$make_assignments} {
 	set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 	set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 	set_global_assignment -name SYSTEMVERILOG_FILE ../../counter/src/counter.sv
-	set_global_assignment -name SYSTEMVERILOG_FILE ../../rdc/src/rdc.sv
 	set_global_assignment -name SYSTEMVERILOG_FILE ../../pkgs/pkg.sv
 	set_global_assignment -name SDC_FILE ../constraints/bin2bcd.sdc
 	set_global_assignment -name SYSTEMVERILOG_FILE ../src/bin2bcd.sv
