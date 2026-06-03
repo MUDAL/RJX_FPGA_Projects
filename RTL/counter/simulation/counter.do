@@ -10,6 +10,7 @@ vmap work work
 
 # Compile SystemVerilog design and testbench files
 vlog -work work -sv -stats=none ../../src/counter.sv
+vlog -work work -sv -stats=none ../../../rdc/src/rdc.sv
 vlog -work work -sv -stats=none ../testbench/counter_tb.sv
 
 # Load design
