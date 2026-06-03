@@ -18,7 +18,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //  SOFTWARE.
 
-// Binary-to-BCD top module.
+// Binary-to-BCD module.
 
 // Algorithm reference: https://en.wikipedia.org/wiki/Double_dabble
 
