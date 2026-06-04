@@ -1,6 +1,6 @@
-# Design: bin2bcd  
+# Simulation: rdc  
 
-## Building the project from a script (Windows users)  
+## Running the simulation from a script (Windows users)    
 
 ```
 Run the command below in PowerShell:

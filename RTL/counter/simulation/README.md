@@ -1,7 +1,6 @@
-# Design: bin2bcd  
+# Simulation: counter
 
-## Building the project from a script (Windows users)  
-
+## Running the simulation from a script (Windows users)  
 ```
 Run the command below in PowerShell:
 
