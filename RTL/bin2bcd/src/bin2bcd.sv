@@ -34,9 +34,10 @@
 // 1. No FIFO buffers are used. Input data arrives at a significantly slower
 // rate than the binary-to-BCD conversion process. Therefore, data loss can
 // not occur and no "ready_out" signal is needed.
-// 2. "valid_in" is a pulse that indicates the arrival of new data. For the 
-// Altera Cyclone IV application, successive "valid_in" pulses are one second 
-// apart. "valid_in" must be asserted for one clock cycle.
+// 2. "valid_in" is a pulse that indicates the arrival of new data. 
+// "valid_in" must be asserted for one clock cycle. The number of clock cycles
+// between successive "valid_in" pulses must exceed the latency or total number
+// of cycles required to perform the conversion, otherwise the design fails.
 // 3. "valid_out" indicates a valid BCD output. Once it is asserted, it stays 
 // asserted until a new valid input data arrives.
 
@@ -121,10 +122,7 @@ module bin2bcd
    
    always_comb begin: bcd_data_path
       bcd_next = bcd_reg;
-      if(state_reg == IDLE && valid_in) begin
-         bcd_next                = {BCD_REG_WIDTH{1'b0}};
-         bcd_next[BIN_WIDTH-1:0] =  bin;
-      end
+      if(state_reg == IDLE && valid_in) bcd_next = {{BCD_WIDTH{1'b0}}, bin};
       else if(shift) bcd_next = {bcd_reg[BCD_REG_WIDTH-2:0], 1'b0};
       else if(state_reg == SHIFT_SYNC && !done) begin
          for(int i = 0; i < BCD_WIDTH/4; i++) begin
