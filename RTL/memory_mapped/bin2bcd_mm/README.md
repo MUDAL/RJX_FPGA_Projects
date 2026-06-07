@@ -13,14 +13,14 @@ In order to facilitate two-way communication between a hard processor and custom
 
 ### Peripheral architecture
 <p align="center">
-    <img width=60% src="../../../Images/bin2bcd_mm.png">
+    <img width=50% src="../../../Images/bin2bcd_mm.png">
 </p>  
 
 ## Programmer's Model  
 
 | Register | Offset | Access | Description
 | :---: | :---: | :---: | --- 
-| Status | 0x00 | R | Provides information about the peripheral's state to the HPS/software.  Bit 0 (BUSY) is set when a binary-to-bcd conversion is ongoing and cleared if not. The HPS software can check the BUSY bit before sending data to the Input Data Register (IDR). Bit 1 (DONE) is set when a conversion is completed. Bit 0 (BUSY) and Bit 1 (DONE) are set/cleared by hardware and are both read-only. The remaining bits in this register are reserved and set to 0.    
+| Status | 0x00 | R | Provides information about the peripheral's state to the HPS/software.  Bit 0 `(BUSY)` is set when a binary-to-bcd conversion is ongoing and cleared if not. The `BUSY` bit must be cleared before the HPS/software sends data to the `Input Data Register (IDR)`. Bit 1 `(DONE)` is set when a conversion is completed. The `DONE` bit must be set before the HPS/software can read valid BCD data. The `BUSY` and `DONE` bits are set/cleared by hardware and are both read-only. The remaining bits in this register are reserved and set to 0 by hardware.    
 | Control | 0x04 | R/W | 
 | Input Data | 0x08 | R/W | 
 | Output Data | 0x0C | R | 
